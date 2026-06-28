@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Calculator Ai</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(() => console.log("PWA Siap!"));
+      }
+    </script>
+    <style>
+        :root {
+            --bg-grad-1: #0f172a;
+            --bg-grad-2: #1e293b;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --btn-bg: #334155;
+            --btn-active: #475569;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2)); min-height: 100vh; color: var(--text-main); display: flex; align-items: center; justify-content: center; margin: 0; }
+        .kalkulator-box { width: 100%; max-width: 380px; background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); padding: 24px; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.08); }
+        .header-title { font-size: 14px; font-weight: 600; text-transform: uppercase; color: var(--primary); margin-bottom: 16px; text-align: center; }
+        .input-teks-area { 
+            width: 100%; 
+            min-height: 80px; /* Memberikan ruang lebih tinggi */
+            padding: 14px 16px; 
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 12px; 
+            font-size: 15px; 
+            color: var(--text-main);
+            box-sizing: border-box; 
+            margin-bottom: 12px; 
+            display: block;        
+            resize: vertical;      /* Memungkinkan user mengatur tinggi jika perlu */
+            white-space: pre-wrap; /* Memastikan teks turun ke bawah */
+        }
+        .layar-display { width: 100%; background: rgba(15, 23, 42, 0.4); border-right: 4px solid var(--primary); padding: 18px; font-size: 24px; text-align: right; font-weight: bold; min-height: 80px; margin-bottom: 20px; border-radius: 8px; color: var(--text-main); resize: none; overflow-y: auto; }
+        .grid-tombol { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        button { padding: 15px; font-size: 18px; border: none; border-radius: 12px; cursor: pointer; background: var(--btn-bg); color: var(--text-main); }
+        button:active { transform: scale(0.95); background: var(--btn-active); }
+        .btn-operator { color: #60a5fa; }
+        .btn-clear { color: #f87171; }
+        .btn-sama-dengan { background: var(--primary); grid-column: span 1; }
+    </style>
+</head>
+<body>
+
+<div class="kalkulator-box">
+    <div class="header-title">Smart Calculator Ai</div>
+    <textarea id="displayHasil" class="layar-display" readonly>0</textarea>
+    <textarea id="inputTeks" class="input-teks-area" placeholder="Ketik rincian..."></textarea>
+    
+    <div class="grid-tombol">
+        <button class="btn-clear" onclick="operasiDasar('C')">C</button>
+        <button class="btn-operator" onclick="operasiDasar('DEL')">⌫</button>
+        <button class="btn-operator" onclick="operasiDasar('(')">(</button>
+        <button class="btn-operator" onclick="operasiDasar(')')">)</button>
+        <button onclick="operasiDasar('7')">7</button>
+        <button onclick="operasiDasar('8')">8</button>
+        <button onclick="operasiDasar('9')">9</button>
+        <button class="btn-operator" onclick="operasiDasar('/')">÷</button>
+        <button onclick="operasiDasar('4')">4</button>
+        <button onclick="operasiDasar('5')">5</button>
+        <button onclick="operasiDasar('6')">6</button>
+        <button class="btn-operator" onclick="operasiDasar('*')">×</button>
+        <button onclick="operasiDasar('1')">1</button>
+        <button onclick="operasiDasar('2')">2</button>
+        <button onclick="operasiDasar('3')">3</button>
+        <button class="btn-operator" onclick="operasiDasar('-')">-</button>
+        <button class="btn-operator" onclick="operasiDasar('.')">.</button>
+        <button onclick="operasiDasar('0')">0</button>
+        <button class="btn-sama-dengan" onclick="hitungHasilAkhir()">=</button>
+        <button class="btn-operator" onclick="operasiDasar('+')">+</button>
+    </div>
+</div>
+
+<script src="./database.js"></script>
+<script src="./brain.js"></script>
+<script>
+    let ekspresiMatematika = "";
+    const display = document.getElementById("displayHasil");
+
+    function operasiDasar(input) {
+        if (input === 'C') {
+            ekspresiMatematika = "";
+            display.value = "0";
+            document.getElementById("inputTeks").value = "";
+        } else if (input === 'DEL') {
+            ekspresiMatematika = ekspresiMatematika.slice(0, -1);
+            display.value = ekspresiMatematika === "" ? "0" : ekspresiMatematika;
+        } else {
+            ekspresiMatematika += input;
+            display.value = ekspresiMatematika;
+        }
+    }
+
+    function hitungHasilAkhir() {
+        let inputTeks = document.getElementById("inputTeks").value.trim();
+        
+        // 1. Mode Kalkulator Standar
+        if (inputTeks === "") {
+            try {
+                let hasil = Function(`"use strict"; return (${ekspresiMatematika.replace(/×/g, '*').replace(/÷/g, '/')})`)();
+                display.value = hasil;
+                ekspresiMatematika = hasil.toString();
+            } catch (e) { display.value = "Error"; }
+            return;
+        }
+
+        // 2. Mode AI (Panggil Fungsi dari brain.js)
+        try {
+            display.value = "Memproses...";
+            let kalimat = inputTeks.toLowerCase().replace(/,/g, '.');
+
+            // A. Panggil Brain: Perbaiki typo (Fuzzy Matching)
+            let kataKata = kalimat.split(" ");
+            kalimat = kataKata.map(kata => cariKataTerdekat(kata, Object.keys(databaseRumusGlobal.kamus_normalisasi))).join(" ");
+
+            // Normalisasi Bahasa ke Variabel
+            for (let salah in databaseRumusGlobal.kamus_normalisasi) {
+                kalimat = kalimat.replace(new RegExp("\\b" + salah + "\\b", "g"), databaseRumusGlobal.kamus_normalisasi[salah]);
+            }
+
+            // Ambil Angka dari kalimat
+            let kumpulanAngka = kalimat.match(/(\d+(\.\d+)?)/g) ? kalimat.match(/(\d+(\.\d+)?)/g).map(Number) : [];
+
+            // Cari Rumus yang Cocok
+            let kategoriAktif = deteksiKategori(inputTeks);
+            console.log("Mode yang aktif sekarang: " + kategoriAktif);
+
+            let rumusTerpilih = null;
+            for (let namaRumus in databaseRumusGlobal.mesin_rumus) {
+                let dataRumus = databaseRumusGlobal.mesin_rumus[namaRumus];
+                if (kumpulanAngka.length >= dataRumus.kondisi_input.length) {
+                    rumusTerpilih = dataRumus;
+                    break;
+                }
+            }
+
+            // B. Panggil Brain: Validasi & Eksekusi
+            if (rumusTerpilih) {
+                if (kumpulanAngka.length < rumusTerpilih.kondisi_input.length) {
+                    display.value = debugRumus(rumusTerpilih.kondisi_input, kumpulanAngka);
+                    return;
+                } else {
+                    let stringFormula = rumusTerpilih.rumus_string;
+                    rumusTerpilih.kondisi_input.forEach((val, i) => {
+                        stringFormula = stringFormula.replace(new RegExp("\\b" + val + "\\b", "g"), kumpulanAngka[i]);
+                    });
+                    let hasil = new Function(`return (${stringFormula})`)();
+                    display.value = hasil + " " + (rumusTerpilih.satuan_output || "");
+                }
+            } else {
+                display.value = "Rumus tidak ditemukan. Periksa rincian Anda.";
+            }
+        } catch (err) {
+            display.value = "Galat: Input tidak valid.";
+        }
+    }
+</script>
+</body>
+</html>
