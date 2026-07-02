@@ -28,6 +28,52 @@ const databaseRumusGlobal = {
     "pengurangan": ["kurang", "minus", "potong", "susut", "buang", "limbah", "pangkas"]
   },
 
+  skema_data: {
+      "DIMENSI": { 
+          satuan: ["m", "cm", "mm", "meter", "centimeter", "inch", "in", "\"", "yard", "yd", "ft", "kaki"], 
+          kunci: ["panjang", "lebar", "tinggi", "tebal"] 
+      },
+      "KUANTITAS": { satuan: ["pcs", "biji", "buah", "lembar", "lusin", "kodi", "gros"], kunci: ["jumlah", "total", "target", "bikin", "pcs"] },
+      "MASSA": { satuan: ["kg", "g", "gram", "ton", "kwintal"], kunci: ["berat", "massa", "ton", "kwintal"] },
+      "VOLUME": { satuan: ["lr", "liter", "ml", "cc"], kunci: ["volume", "isi"] },
+      "WAKTU": { satuan: ["jam", "menit", "detik", "hari"], kunci: ["waktu", "durasi"] },
+      "SUHU": { satuan: ["c", "celcius", "f", "fahrenheit", "k", "kelvin"], kunci: ["suhu", "temperatur"] }
+  },
+
+  "kamus_normalisasi": {
+    "m": "meter", "cm": "centimeter", "kg": "kilogram", "g": "gram", "lr": "liter", "inch": "inch", "in": "inch", "\"": "inch", "yard": "yard", "yd": "yard", "kaki": "feet", "ft": "feet",
+    "pcs": "TARGET", "biji": "TARGET", "buah": "TARGET", "lembar": "TARGET", "potong": "TARGET", "potongan": "TARGET", "botol": "TARGET", "batang": "TARGET",
+    "panjang": "BESAR_PANJANG", "p": "BESAR_PANJANG",
+    "lebar": "BESAR_LEBAR", "l": "BESAR_LEBAR",
+    "tinggi": "BESAR_TINGGI", "t": "BESAR_TINGGI",
+    "waktu": "WAKTU", "jarak": "JARAK", "kecepatan": "KECEPATAN",
+    "ton": "ANGKA_AWAL_TON", "kuintal": "ANGKA_AWAL_KW", "gros": "ANGKA_AWAL_GROS",
+    "gimana": "berapa", "berpa": "berapa", "butuh": "berapa",
+    "klo": "jika", "klw": "jika", "kalau": "jika", "soalnya": "jika",
+    "tiap": "per", "setiap": "per",
+    "lsn": "lusin", "lusin": "lusin", "losin": "lusin", "kdi": "kodi", "kodi": "kodi",
+    "menghasilkan": "jadi", "membuat": "jadi", "bikin": "jadi", "buat": "jadi",
+    "diameter": "DIAMETER", "d": "DIAMETER",
+    "j": "JARAK",
+    "w": "WAKTU",
+    "massa": "MASSA",
+    "energi": "ENERGI",
+    "mol": "MOL", 
+    "volume": "VOLUME", "vol": "VOLUME",
+    "massa_molar": "MASSA_MOLAR",
+    "molaritas": "MOLARITAS",
+    "celsius": "SUHU_CELSIUS", "celcius": "SUHU_CELSIUS", "c": "SUHU_CELSIUS",
+    "suhu": "SUHU_CELSIUS", "temperatur": "SUHU_CELSIUS",
+    // Variasi kata untuk "Panjang"
+    "pg": "PANJANG_POTONGAN",
+    "pjg": "PANJANG_POTONGAN",
+    "panjangnya": "PANJANG_POTONGAN",
+    
+    // Variasi kata untuk "Lebar"
+    "lb": "LEBAR_POTONGAN",
+    "lebarnya": "LEBAR_POTONGAN"
+  },
+
   "mesin_rumus": {
     // --- KATEGORI KONVEKSI / BIDANG ---
     "hitung_panjang_kain_dari_target_pcs": {
@@ -195,52 +241,46 @@ const databaseRumusGlobal = {
     },
 
     // --- SUHU (Termodinamika) ---
-    "konversi_c_ke_f": {
+    "konversi_suhu_c_ke_f": {
         "kondisi_input": ["SUHU_CELSIUS"],
         "rumus_string": "(SUHU_CELSIUS * 9/5) + 32",
-        "satuan_output": " °F"
+        "satuan_output": " °F",
+        "kategori": "termal"
     },
-    "konversi_c_ke_k": {
+    "konversi_suhu_c_ke_k": {
         "kondisi_input": ["SUHU_CELSIUS"],
         "rumus_string": "SUHU_CELSIUS + 273.15",
-        "satuan_output": " K"
+        "satuan_output": " K",
+        "kategori": "termal"
     }
   },
 
-  "kamus_normalisasi": {
-    "mtr": "meter", "m": "meter", "cm": "centimeter", "senti": "centimeter",
-    "kg": "kilogram", "kilo": "kilogram", "gr": "gram", "g": "gram",
-    "ltr": "liter", "l": "liter", "gimana": "berapa", "berpa": "berapa",
-    "klo": "jika", "klw": "jika", "kalau": "jika", "soalnya": "jika",
-    "tiap": "per", "setiap": "per", "peces": "pcs", "biji": "pcs",
-    "batang": "pcs", "botol": "pcs", "lsn": "lusin", "kdi": "kodi",
-    "gross": "gros", "lembar": "pcs", "potong": "pcs", "buah": "pcs",
-    "butuh": "berapa", "menghasilkan": "jadi", "membuat": "jadi",
-    "potongan": "panjang_per_pcs", "lebar": "lebar_potongan", "panjang": "panjang_potongan",
-    "panjang_kain": "panjang_kain_utama", "lebar_kain": "lebar_kain_utama",
-    "kain_lebar": "lebar_kain_utama", "kain_panjang": "panjang_kain_utama",
-    "bikin": "jadi", "buat": "jadi", "tinggi": "tinggi_benda",
-    "ton": "ton ANGKA_AWAL_TON",
-    "kuintal": "kuintal ANGKA_AWAL_KW",
-    "kwintal": "kuintal ANGKA_AWAL_KW",
-    "kw": "kuintal ANGKA_AWAL_KW",
-    "gros": "gros ANGKA_AWAL_GROS",
-    "pcs": "TARGET", "biji": "TARGET", "buah": "TARGET", "lembar": "TARGET",
-    "panjang": "PANJANG_POTONGAN", "p": "PANJANG_POTONGAN",
-    "lebar": "LEBAR_POTONGAN", "l": "LEBAR_POTONGAN",
-    "kain": "LEBAR_KAIN_UTAMA",
-    "diameter": "DIAMETER", "d": "DIAMETER",
-    "jarak": "JARAK", "j": "JARAK",
-    "waktu": "WAKTU", "w": "WAKTU",
-    "massa": "MASSA", "m": "MASSA",
-    "tinggi": "TINGGI", "t": "TINGGI",
-    "kecepatan": "KECEPATAN",
-    "energi": "ENERGI",
-    "mol": "MOL", 
-    "volume": "VOLUME", "vol": "VOLUME",
-    "massa": "MASSA_MOLAR", "massa_molar": "MASSA_MOLAR",
-    "molaritas": "MOLARITAS",
-    "celsius": "SUHU_CELSIUS", "celcius": "SUHU_CELSIUS", "c": "SUHU_CELSIUS",
-    "suhu": "SUHU_CELSIUS", "temperatur": "SUHU_CELSIUS"
+  pesan_humanis: {
+      // Definisi nama variabel untuk digunakan AI
+      label: {
+          "BESAR_PANJANG": "panjang yang dipotong",
+          "BESAR_LEBAR": "lebar yang dipotong",
+          "KECIL_PANJANG": "panjang potongan",
+          "KECIL_LEBAR": "lebar potongan",
+          "TARGET": "jumlah potongan yang ingin dibuat",
+          "BERAT_TOTAL": "berat total",
+          "WAKTU": "durasi waktu",
+          "SUHU_CELSIUS": "suhu dalam Celsius"
+      },
+      // Template pertanyaan yang fleksibel
+      template_tanya: [
+          "Sepertinya saya butuh data {LABEL} untuk menghitung ini.",
+          "Bisakah Anda tambahkan informasi mengenai {LABEL}?",
+          "Untuk melanjutkan perhitungan, saya memerlukan {LABEL}.",
+          "Boleh dibantu sebutkan {LABEL}-nya?"
+      ]
+  },
+
+  kamus_default_satuan: {
+      "panjang": "cm",
+      "lebar": "cm",
+      "tinggi": "cm",
+      "berat": "kg",
+      "target": "pcs"
   }
 };
